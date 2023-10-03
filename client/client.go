@@ -3,10 +3,10 @@ package main
 import (
 	"bufio"
 	"context"
-	"fmt"
+	"io"
 	"log"
 	"os"
-	"strings"
+	"time"
 
 	gRPC "github.com/Juules32/GRPC/proto"
 
@@ -14,10 +14,10 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-var server gRPC.TemplateClient  //the server
-var ServerConn *grpc.ClientConn //the server connection
+var server gRPC.StreamingServiceClient //the server
+var ServerConn *grpc.ClientConn        //the server connection
 
-func conReady(s gRPC.TemplateClient) bool {
+func conReady(s gRPC.StreamingServiceClient) bool {
 	return ServerConn.GetState().String() == "READY"
 }
 
@@ -33,41 +33,42 @@ func main() {
 		return
 	}
 
-	server = gRPC.NewTemplateClient(conn)
+	server = gRPC.NewStreamingServiceClient(conn)
 	ServerConn = conn
 	log.Println("the connection is: ", conn.GetState().String())
+	defer ServerConn.Close()
 
+	stream, err := server.StreamData(context.Background())
+
+	go sendMessages(stream)
+
+	for {
+		resp, err := stream.Recv()
+		if err == io.EOF {
+			break // End of the stream
+		}
+		if err != nil {
+			log.Fatalf("Error receiving response: %v", err)
+		}
+		log.Printf("Received response: %s", resp.Message)
+	}
+}
+
+func sendMessages(stream gRPC.StreamingService_StreamDataClient) {
 	reader := bufio.NewReader(os.Stdin)
 
-	//Infinite loop to listen for clients input.
+	// Send data to the server
 	for {
-		fmt.Print("-> ")
 
-		//Read input into var input and any errors into err
 		input, err := reader.ReadString('\n')
 		if err != nil {
 			log.Fatal(err)
 		}
-		input = strings.TrimSpace(input) //Trim input
 
-		if !conReady(server) {
-			log.Printf("Client %s: something was wrong with the connection to the server :5400")
-			continue
+		greeting := &gRPC.DataRequest{ClientName: "benja", Message: input}
+		if err := stream.Send(greeting); err != nil {
+			log.Fatalf("Error sending data: %v", err)
 		}
-
-		message := &gRPC.Greeting{
-			ClientName: "benja",
-			Message:    "hejsa",
-		}
-
-		stream, err := server.SayHi(context.Background())
-
-		stream.Send(message)
-		farewell, err := stream.CloseAndRecv()
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		log.Println("server says: ", farewell)
+		time.Sleep(time.Second)
 	}
 }

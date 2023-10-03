@@ -1,17 +1,18 @@
 syntax = "proto3";
 option go_package = "https://github.com/Juules32/GRPC/proto";
 package proto;
-service Template
+
+service StreamingService
 {
-    rpc SayHi (stream Greeting) returns (stream Farewell);
+    rpc StreamData(stream DataRequest) returns (stream DataResponse);
 }
 
-message Greeting {
+message DataRequest {
     string clientName = 1;
     string message = 2;
 }
 
-message Farewell {
+message DataResponse {
     string message = 1;
 }
 

@@ -19,120 +19,120 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Template_SayHi_FullMethodName = "/proto.Template/SayHi"
+	StreamingService_StreamData_FullMethodName = "/proto.StreamingService/StreamData"
 )
 
-// TemplateClient is the client API for Template service.
+// StreamingServiceClient is the client API for StreamingService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type TemplateClient interface {
-	SayHi(ctx context.Context, opts ...grpc.CallOption) (Template_SayHiClient, error)
+type StreamingServiceClient interface {
+	StreamData(ctx context.Context, opts ...grpc.CallOption) (StreamingService_StreamDataClient, error)
 }
 
-type templateClient struct {
+type streamingServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewTemplateClient(cc grpc.ClientConnInterface) TemplateClient {
-	return &templateClient{cc}
+func NewStreamingServiceClient(cc grpc.ClientConnInterface) StreamingServiceClient {
+	return &streamingServiceClient{cc}
 }
 
-func (c *templateClient) SayHi(ctx context.Context, opts ...grpc.CallOption) (Template_SayHiClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Template_ServiceDesc.Streams[0], Template_SayHi_FullMethodName, opts...)
+func (c *streamingServiceClient) StreamData(ctx context.Context, opts ...grpc.CallOption) (StreamingService_StreamDataClient, error) {
+	stream, err := c.cc.NewStream(ctx, &StreamingService_ServiceDesc.Streams[0], StreamingService_StreamData_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &templateSayHiClient{stream}
+	x := &streamingServiceStreamDataClient{stream}
 	return x, nil
 }
 
-type Template_SayHiClient interface {
-	Send(*Greeting) error
-	Recv() (*Farewell, error)
+type StreamingService_StreamDataClient interface {
+	Send(*DataRequest) error
+	Recv() (*DataResponse, error)
 	grpc.ClientStream
 }
 
-type templateSayHiClient struct {
+type streamingServiceStreamDataClient struct {
 	grpc.ClientStream
 }
 
-func (x *templateSayHiClient) Send(m *Greeting) error {
+func (x *streamingServiceStreamDataClient) Send(m *DataRequest) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *templateSayHiClient) Recv() (*Farewell, error) {
-	m := new(Farewell)
+func (x *streamingServiceStreamDataClient) Recv() (*DataResponse, error) {
+	m := new(DataResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
 	return m, nil
 }
 
-// TemplateServer is the server API for Template service.
-// All implementations must embed UnimplementedTemplateServer
+// StreamingServiceServer is the server API for StreamingService service.
+// All implementations must embed UnimplementedStreamingServiceServer
 // for forward compatibility
-type TemplateServer interface {
-	SayHi(Template_SayHiServer) error
-	mustEmbedUnimplementedTemplateServer()
+type StreamingServiceServer interface {
+	StreamData(StreamingService_StreamDataServer) error
+	mustEmbedUnimplementedStreamingServiceServer()
 }
 
-// UnimplementedTemplateServer must be embedded to have forward compatible implementations.
-type UnimplementedTemplateServer struct {
+// UnimplementedStreamingServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedStreamingServiceServer struct {
 }
 
-func (UnimplementedTemplateServer) SayHi(Template_SayHiServer) error {
-	return status.Errorf(codes.Unimplemented, "method SayHi not implemented")
+func (UnimplementedStreamingServiceServer) StreamData(StreamingService_StreamDataServer) error {
+	return status.Errorf(codes.Unimplemented, "method StreamData not implemented")
 }
-func (UnimplementedTemplateServer) mustEmbedUnimplementedTemplateServer() {}
+func (UnimplementedStreamingServiceServer) mustEmbedUnimplementedStreamingServiceServer() {}
 
-// UnsafeTemplateServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to TemplateServer will
+// UnsafeStreamingServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to StreamingServiceServer will
 // result in compilation errors.
-type UnsafeTemplateServer interface {
-	mustEmbedUnimplementedTemplateServer()
+type UnsafeStreamingServiceServer interface {
+	mustEmbedUnimplementedStreamingServiceServer()
 }
 
-func RegisterTemplateServer(s grpc.ServiceRegistrar, srv TemplateServer) {
-	s.RegisterService(&Template_ServiceDesc, srv)
+func RegisterStreamingServiceServer(s grpc.ServiceRegistrar, srv StreamingServiceServer) {
+	s.RegisterService(&StreamingService_ServiceDesc, srv)
 }
 
-func _Template_SayHi_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(TemplateServer).SayHi(&templateSayHiServer{stream})
+func _StreamingService_StreamData_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(StreamingServiceServer).StreamData(&streamingServiceStreamDataServer{stream})
 }
 
-type Template_SayHiServer interface {
-	Send(*Farewell) error
-	Recv() (*Greeting, error)
+type StreamingService_StreamDataServer interface {
+	Send(*DataResponse) error
+	Recv() (*DataRequest, error)
 	grpc.ServerStream
 }
 
-type templateSayHiServer struct {
+type streamingServiceStreamDataServer struct {
 	grpc.ServerStream
 }
 
-func (x *templateSayHiServer) Send(m *Farewell) error {
+func (x *streamingServiceStreamDataServer) Send(m *DataResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *templateSayHiServer) Recv() (*Greeting, error) {
-	m := new(Greeting)
+func (x *streamingServiceStreamDataServer) Recv() (*DataRequest, error) {
+	m := new(DataRequest)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
 	return m, nil
 }
 
-// Template_ServiceDesc is the grpc.ServiceDesc for Template service.
+// StreamingService_ServiceDesc is the grpc.ServiceDesc for StreamingService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var Template_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "proto.Template",
-	HandlerType: (*TemplateServer)(nil),
+var StreamingService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "proto.StreamingService",
+	HandlerType: (*StreamingServiceServer)(nil),
 	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "SayHi",
-			Handler:       _Template_SayHi_Handler,
+			StreamName:    "StreamData",
+			Handler:       _StreamingService_StreamData_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
 		},
